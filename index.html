@@ -9,6 +9,7 @@
       font-family: monospace;
       padding: 20px;
       margin: 0;
+      overflow: hidden;
     }
     #barra {
       width: 100%;
@@ -23,12 +24,35 @@
       background: #0f0;
       transition: width 0.3s;
     }
-    #texto { font-size: 16px; line-height: 1.6; }
+    #texto {
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    #troll {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: #ff0000;
+      color: #ffff00;
+      font-size: 10vw;
+      font-weight: bold;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      animation: flash 0.15s infinite;
+      font-family: 'Comic Sans MS', cursive;
+    }
+    @keyframes flash {
+      0% { background: #ff0000; }
+      50% { background: #000; }
+    }
   </style>
 </head>
 <body>
-  <div id="texto">Iniciando escaneo y estraxion de datos del EQUIPO...</div>
+  <div id="texto">Iniciando escaneo y extracción de datos del EQUIPO...</div>
   <div id="barra"><div id="progreso"></div></div>
+  <div id="troll">YOU ARE AN<br>IDIOT!!!</div>
 
   <script>
     const archivos = [
@@ -37,30 +61,45 @@
       "Escaneando /data/app...",
       "Analizando memoria RAM...",
       "Verificando apps instaladas...",
-      "Buscando rootkits..."
+      "Buscando rootkits...",
+      "Escaneando permisos de acceso...",
+      "Verificando integridad del sistema..."
     ];
 
     let progreso = 0;
     let i = 0;
 
+    document.addEventListener('click',()=>{
+      if(!document.fullscreenElement){
+        document.documentElement.requestFullscreen().catch(()=>{});
+      }
+    });
+
+    window.addEventListener('beforeunload',(e)=>{
+      if(progreso<100){
+        e.preventDefault();
+        e.returnValue='⚠️ Análisis en progreso... ¿Seguro que quieres salir?';
+      }
+    });
+
     function actualizar() {
       if (progreso < 100) {
-        progreso += Math.random() * 3 + 1;
+        progreso += Math.random() * 2 + 0.5;
         if (progreso > 100) progreso = 100;
 
         document.getElementById('progreso').style.width = progreso + '%';
 
-        if (i < archivos.length && progreso > i * 15) {
+        if (i < archivos.length && progreso > i * 10) {
           document.getElementById('texto').innerHTML += "<br>" + archivos[i];
           i++;
         }
 
-        setTimeout(actualizar, 200 + Math.random() * 300);
+        setTimeout(actualizar, 300 + Math.random() * 400);
       } else {
-        document.getElementById('texto').innerHTML += "<br><br>¡AMENAZA DETECTADA!";
-        setTimeout(() => {
-          alert("⚠️ VIRUS TROYANO DETECTADO ⚠️\n\nNombre: Trojan.FakePrank\nRiesgo: ALTO\n:).");
-        }, 800);
+        if(navigator.vibrate) navigator.vibrate([300,100,300,100,300]);
+        document.getElementById('troll').style.display = 'flex';
+        const audio = new Audio("data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAESsAAABAAZGF0YQAAAAA=");
+        audio.play().catch(()=>{});
       }
     }
 
